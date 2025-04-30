@@ -1,0 +1,575 @@
+<html>
+        <head><title>Downloaded HTML</title></head>
+        <body>
+            <pre style="white-space: pre-wrap; word-wrap: break-word;"><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pump Processing Tracking System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .form-section, .tracking-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .form-row {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .form-row label {
+            width: 200px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+        }
+        .status-completed {
+            background-color: #d4edda;
+        }
+        .action-btn {
+            padding: 5px 10px;
+            margin-right: 5px;
+            font-size: 14px;
+        }
+        .action-btn.complete {
+            background-color: #28a745;
+        }
+        .action-btn.edit {
+            background-color: #ffc107;
+            color: black;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #e9ecef;
+            margin-right: 5px;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .details-section {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .details-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .details-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .details-row label {
+            width: 150px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pump Processing Tracking System</h1>
+
+        <div class="tabs">
+            <div class="tab active" onclick="openTab('new-entry')">New Pump Entry</div>
+            <div class="tab" onclick="openTab('tracking')">Pump Tracking</div>
+            <div class="tab" onclick="openTab('reports')">Reports</div>
+        </div>
+
+        <div id="new-entry" class="tab-content active">
+            <div class="form-section">
+                <h2>New Pump Entry</h2>
+                <div class="form-row">
+                    <label for="pump-id">Pump ID/Number:</label>
+                    <input type="text" id="pump-id" placeholder="Enter pump identification">
+                </div>
+                <div class="form-row">
+                    <label for="pump-type">Pump Type:</label>
+                    <input type="text" id="pump-type" placeholder="Enter pump type/model">
+                </div>
+                <div class="form-row">
+                    <label for="received-time">Received at Loading Point:</label>
+                    <input type="datetime-local" id="received-time">
+                </div>
+                <div class="form-row">
+                    <label for="received-by">Received By:</label>
+                    <input type="text" id="received-by" placeholder="Operator name">
+                </div>
+                <button onclick="addNewPump()">Add New Pump</button>
+            </div>
+        </div>
+
+        <div id="tracking" class="tab-content">
+            <div class="tracking-section">
+                <h2>Current Pump Status</h2>
+                <table id="pump-table">
+                    <thead>
+                        <tr>
+                            <th>Pump ID</th>
+                            <th>Type</th>
+                            <th>Received At</th>
+                            <th>Current Stage</th>
+                            <th>Stage Start Time</th>
+                            <th>Time Taken</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pump-data">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="reports" class="tab-content">
+            <div class="tracking-section">
+                <h2>Processing Reports</h2>
+                <div class="form-row">
+                    <label for="report-date">Select Date:</label>
+                    <input type="date" id="report-date">
+                    <button onclick="generateReport()" style="margin-left: 20px;">Generate Report</button>
+                </div>
+                <div id="report-results">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data storage (in a real app, this would be a database)
+        let pumps = [];
+
+        // Tab functionality
+        function openTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Add new pump to the system
+        function addNewPump() {
+            const pumpId = document.getElementById('pump-id').value;
+            const pumpType = document.getElementById('pump-type').value;
+            const receivedTime = document.getElementById('received-time').value;
+            const receivedBy = document.getElementById('received-by').value;
+
+            if (!pumpId || !pumpType || !receivedTime || !receivedBy) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            const newPump = {
+                id: pumpId,
+                type: pumpType,
+                receivedAt: new Date(receivedTime),
+                currentStage: 'Loading Point',
+                stageStartTime: new Date(receivedTime),
+                receivedBy: receivedBy,
+                stages: {
+                    loading: { start: new Date(receivedTime), end: null, operator: receivedBy },
+                    dismantling: { start: null, end: null, operator: null, partsToCut: [] },
+                    machineShop: {
+                        start: null,
+                        end: null,
+                        disassemblyOperator: null,
+                        workOperator: null,
+                        assemblyOperator: null,
+                        cuttingDetails: ''
+                    },
+                    reassembly: { start: null, end: null, operator: null },
+                    alignment: { start: null, end: null, operator: null }
+                }
+            };
+
+            pumps.push(newPump);
+            updatePumpTable();
+            clearForm();
+            alert('Pump added successfully!');
+        }
+
+        // Clear the form after submission
+        function clearForm() {
+            document.getElementById('pump-id').value = '';
+            document.getElementById('pump-type').value = '';
+            document.getElementById('received-time').value = '';
+            document.getElementById('received-by').value = '';
+        }
+
+        // Update the pump tracking table
+        function updatePumpTable() {
+            const tableBody = document.getElementById('pump-data');
+            tableBody.innerHTML = '';
+
+            pumps.forEach((pump, index) => {
+                const row = document.createElement('tr');
+
+                let timeTaken = 'In progress';
+                if (pump.currentStage !== 'Completed') {
+                    const diff = Math.floor((new Date() - pump.stageStartTime) / 60000); // minutes
+                    timeTaken = diff + ' mins';
+                }
+
+                let stageInfo = pump.currentStage;
+                if (pump.currentStage === 'Dismantling' && pump.stages.dismantling.partsToCut.length > 0) {
+                    stageInfo += ` (Parts to cut: ${pump.stages.dismantling.partsToCut.join(', ')})`;
+                }
+
+                row.innerHTML = `
+                    <td>${pump.id}</td>
+                    <td>${pump.type}</td>
+                    <td>${formatDate(pump.receivedAt)}</td>
+                    <td class="status-${pump.currentStage === 'Completed' ? 'completed' : 'pending'}">${stageInfo}</td>
+                    <td>${formatDate(pump.stageStartTime)}</td>
+                    <td>${timeTaken}</td>
+                    <td>
+                        ${pump.currentStage !== 'Completed' ?
+                          `<button class="action-btn complete" onclick="updatePumpStage(${index})">Mark ${getNextStage(pump.currentStage)}</button>` : ''}
+                        <button class="action-btn edit" onclick="editPump(${index})">Details</button>
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Get the next stage in the process
+        function getNextStage(currentStage) {
+            const stages = [
+                'Loading Point',
+                'Dismantling',
+                'Machine Shop',
+                'Reassembly',
+                'Alignment',
+                'Completed'
+            ];
+
+            const currentIndex = stages.indexOf(currentStage);
+            return stages[currentIndex + 1] || 'Completed';
+        }
+
+        // Update pump to next stage
+        function updatePumpStage(index) {
+            const pump = pumps[index];
+            const nextStage = getNextStage(pump.currentStage);
+
+            // Record end time for current stage and potentially operator
+            const now = new Date();
+            if (pump.currentStage === 'Loading Point') {
+                pump.stages.loading.end = now;
+            } else if (pump.currentStage === 'Dismantling') {
+                pump.stages.dismantling.end = now;
+            } else if (pump.currentStage === 'Machine Shop') {
+                pump.stages.machineShop.end = now;
+            } else if (pump.currentStage === 'Reassembly') {
+                pump.stages.reassembly.end = now;
+            } else if (pump.currentStage === 'Alignment') {
+                pump.stages.alignment.end = now;
+            }
+
+            // Set start time and other details for the next stage
+            if (nextStage === 'Dismantling') {
+                pump.stages.dismantling.start = now;
+                const partsOptions = ['Impeller', 'Sleeve', 'Stuffing Box', 'Collar'];
+                const selectedParts = prompt(`Select parts to cut (comma separated):\n${partsOptions.join(', ')}`, 'Impeller');
+                if (selectedParts) {
+                    pump.stages.dismantling.partsToCut = selectedParts.split(',').map(p => p.trim());
+                }
+            } else if (nextStage === 'Machine Shop') {
+                pump.stages.machineShop.start = now;
+                pump.stages.machineShop.cuttingDetails = pump.stages.dismantling.partsToCut.join(', ');
+                pump.stages.machineShop.disassemblyOperator = prompt("Enter operator who disassembled/opened in Machine Shop:");
+                pump.stages.machineShop.workOperator = prompt("Enter operator who worked in Machine Shop:");
+            } else if (nextStage === 'Reassembly') {
+                pump.stages.reassembly.start = now;
+                pump.stages.reassembly.operator = prompt("Enter operator who performed reassembly:");
+            } else if (nextStage === 'Alignment') {
+                pump.stages.alignment.start = now;
+                pump.stages.alignment.operator = prompt("Enter operator who performed alignment:");
+            }
+
+            pump.currentStage = nextStage;
+            pump.stageStartTime = now;
+            updatePumpTable();
+        }
+
+        // Edit pump details
+        function editPump(index) {
+            const pump = pumps[index];
+            let detailsHTML = `<h3>Pump Details - ${pump.id}</h3>`;
+
+            detailsHTML += `<div class="details-section">
+                <h3>Loading Point</h3>
+                <div class="details-row"><label>Received:</label> <span>${formatDate(pump.stages.loading.start)}</span></div>
+                <div class="details-row"><label>By:</label> <span>${pump.stages.loading.operator || '-'}</span></div>
+                ${pump.stages.loading.end ? `<div class="details-row"><label>Completed:</label> <span>${formatDate(pump.stages.loading.end)}</span></div>` : ''}
+            </div>`;
+
+            detailsHTML += `<div class="details-section">
+                <h3>Dismantling</h3>
+                ${pump.stages.dismantling.start ? `
+                    <div class="details-row"><label>Started:</label> <span>${formatDate(pump.stages.dismantling.start)}</span></div>
+                    <div class="details-row"><label>Parts to cut:</label> <span>${pump.stages.dismantling.partsToCut.join(', ') || 'None'}</span></div>
+                    ${pump.stages.dismantling.end ? `<div class="details-row"><label>Completed:</label> <span>${formatDate(pump.stages.dismantling.end)}</span></div>
+                    <div class="details-row"><label>Time taken:</label> <span>${formatTimeDifference(pump.stages.dismantling.start, pump.stages.dismantling.end)}</span></div>` : ''}
+                ` : `<p>Not started</p>`}
+            </div>`;
+
+            detailsHTML += `<div class="details-section">
+                <h3>Machine Shop</h3>
+                ${pump.stages.machineShop.start ? `
+                    <div class="details-row"><label>Started:</label> <span>${formatDate(pump.stages.machineShop.start)}</span></div>
+                    <div class="details-row"><label>Disassembly Operator:</label> <span>${pump.stages.machineShop.disassemblyOperator || '-'}</span></div>
+                    <div class="details-row"><label>Work Operator:</label> <span>${pump.stages.machineShop.workOperator || '-'}</span></div>
+                    <div class="details-row"><label>Cutting details:</label> <span>${pump.stages.machineShop.cuttingDetails || '-'}</span></div>
+                    ${pump.stages.machineShop.end ? `<div class="details-row"><label>Completed:</label> <span>${formatDate(pump.stages.machineShop.end)}</span></div>
+                    <div class="details-row"><label>Time taken:</label> <span>${formatTimeDifference(pump.stages.machineShop.start, pump.stages.machineShop.end)}</span></div>` : ''}
+                    ${pump.stages.machineShop.assemblyOperator ? `<div class="details-row"><label>Assembly Operator:</label> <span>${pump.stages.machineShop.assemblyOperator}</span></div>` : ''}
+                ` : `<p>Not started</p>`}
+            </div>`;
+
+            detailsHTML += `<div class="details-section">
+                <h3>Reassembly</h3>
+                ${pump.stages.reassembly.start ? `
+                    <div class="details-row"><label>Started:</label> <span>${formatDate(pump.stages.reassembly.start)}</span></div>
+                    <div class="details-row"><label>Operator:</label> <span>${pump.stages.reassembly.operator || '-'}</span></div>
+                    ${pump.stages.reassembly.end ? `<div class="details-row"><label>Completed:</label> <span>${formatDate(pump.stages.reassembly.end)}</span></div>
+                    <div class="details-row"><label>Time taken:</label> <span>${formatTimeDifference(pump.stages.reassembly.start, pump.stages.reassembly.end)}</span></div>` : ''}
+                ` : `<p>Not started</p>`}
+            </div>`;
+
+            detailsHTML += `<div class="details-section">
+                <h3>Alignment</h3>
+                ${pump.stages.alignment.start ? `
+                    <div class="details-row"><label>Started:</label> <span>${formatDate(pump.stages.alignment.start)}</span></div>
+                    <div class="details-row"><label>Operator:</label> <span>${pump.stages.alignment.operator || '-'}</span></div>
+                    ${pump.stages.alignment.end ? `<div class="details-row"><label>Completed:</label> <span>${formatDate(pump.stages.alignment.end)}</span></div>
+                    <div class="details-row"><label>Time taken:</label> <span>${formatTimeDifference(pump.stages.alignment.start, pump.stages.alignment.end)}</span></div>` : ''}
+                ` : `<p>Not started</p>`}
+            </div>`;
+
+            const detailsContainer = document.createElement('div');
+            detailsContainer.innerHTML = detailsHTML;
+            alert(detailsContainer.innerHTML); // Using alert for simplicity, consider a modal in a real application
+        }
+
+        // Generate daily report
+        function generateReport() {
+            const dateStr = document.getElementById('report-date').value;
+            if (!dateStr) {
+                alert('Please select a date');
+                return;
+            }
+
+            const selectedDate = new Date(dateStr);
+            const nextDay = new Date(selectedDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+
+            const dailyPumps = pumps.filter(pump => {
+                return pump.receivedAt >= selectedDate && pump.receivedAt < nextDay;
+            });
+
+            let reportHTML = `<h3>Report for ${selectedDate.toDateString()}</h3>`;
+
+            if (dailyPumps.length === 0) {
+                reportHTML += `<p>No pumps processed on this date.</p>`;
+            } else {
+                reportHTML += `<p>Total pumps processed: ${dailyPumps.length}</p>`;
+                reportHTML += `<table border="1" cellpadding="5" cellspacing="0" width="100%">
+                    <tr>
+                        <th>Pump ID</th>
+                        <th>Type</th>
+                        <th>Received At</th>
+                        <th>Completed At</th>
+                        <th>Total Time</th>
+                        <th>Status</th>
+                    </tr>`;
+
+                dailyPumps.forEach(pump => {
+                    const completed = pump.currentStage === 'Completed';
+                    const completedAt = completed ? pump.stages.alignment.end : null;
+                    const totalTime = completed && pump.receivedAt && completedAt ?
+                        formatTimeDifference(pump.receivedAt, completedAt) :
+                        'Not completed';
+
+                    reportHTML += `
+                    <tr>
+                        <td>${pump.id}</td>
+                        <td>${pump.type}</td>
+                        <td>${formatDate(pump.receivedAt)}</td>
+                        <td>${completed ? formatDate(completedAt) : '-'}</td>
+                        <td>${totalTime}</td>
+                        <td>${pump.currentStage}</td>
+                    </tr>`;
+                });
+
+                reportHTML += `</table>`;
+            }
+
+            document.getElementById('report-results').innerHTML = reportHTML;
+        }
+
+        // Helper function to format dates
+        function formatDate(date) {
+            if (!date) return '-';
+            const d = new Date(date);
+            return d.toLocaleString();
+        }
+
+        // Helper function to format time difference
+        function formatTimeDifference(start, end) {
+            if (!start || !end) return '-';
+            const diffMs = end.getTime() - start.getTime();
+            const diffMins = Math.round(diffMs / 60000);
+            return `${diffMins} mins`;
+        }
+
+        // Initialize with some sample data
+        function initSampleData() {
+            const now = new Date();
+            const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
+            const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+
+            pumps = [
+                {
+                    id: 'PMP-1001',
+                    type: 'Centrifugal 4"',
+                    receivedAt: twoHoursAgo,
+                    currentStage: 'Alignment',
+                    stageStartTime: new Date(now.getTime() - 15 * 60 * 1000),
+                    receivedBy: 'Operator 1',
+                    stages: {
+                        loading: { start: twoHoursAgo, end: new Date(twoHoursAgo.getTime() + 5 * 60 * 1000), operator: 'Operator 1' },
+                        dismantling: {
+                            start: new Date(twoHoursAgo.getTime() + 5 * 60 * 1000),
+                            end: new Date(twoHoursAgo.getTime() + 35 * 60 * 1000),
+                            operator: 'Operator 2',
+                            partsToCut: ['Impeller', 'Sleeve']
+                        },
+                        machineShop: {
+                            start: new Date(twoHoursAgo.getTime() + 35 * 60 * 1000),
+                            end: new Date(twoHoursAgo.getTime() + 75 * 60 * 1000),
+                            disassemblyOperator: 'Operator A',
+                            workOperator: 'Operator B',
+                            assemblyOperator: 'Operator C',
+                            cuttingDetails: 'Impeller and Sleeve trimmed'
+                        },
+                        reassembly: {
+                            start: new Date(twoHoursAgo.getTime() + 75 * 60 * 1000),
+                            end: new Date(twoHoursAgo.getTime() + 105 * 60 * 1000),
+                            operator: 'Operator 4'
+                        },
+                        alignment: {
+                            start: new Date(now.getTime() - 15 * 60 * 1000),
+                            end: null,
+                            operator: 'Operator 5'
+                        }
+                    }
+                },
+                {
+                    id: 'PMP-1002',
+                    type: 'Submersible 6"',
+                    receivedAt: oneHourAgo,
+                    currentStage: 'Machine Shop',
+                    stageStartTime: new Date(oneHourAgo.getTime() + 20 * 60 * 1000),
+                    receivedBy: 'Operator 6',
+                    stages: {
+                        loading: { start: oneHourAgo, end: new Date(oneHourAgo.getTime() + 10 * 60 * 1000), operator: 'Operator 6' },
+                        dismantling: {
+                            start: new Date(oneHourAgo.getTime() + 10 * 60 * 1000),
+                            end: new Date(oneHourAgo.getTime() + 20 * 60 * 1000),
+                            operator: 'Operator 7',
+                            partsToCut: ['Shaft']
+                        },
+                        machineShop: {
+                            start: new Date(oneHourAgo.getTime() + 20 * 60 * 1000),
+                            end: null,
+                            disassemblyOperator: 'Operator D',
+                            workOperator: 'Operator E',
+                            assemblyOperator: null,
+                            cuttingDetails: 'Shaft machined'
+                        },
+                        reassembly: { start: null, end: null, operator: null },
+                        alignment: { start: null, end: null, operator: null }
+                    }
+                }
+            ];
+            updatePumpTable();
+        }
+
+        initSampleData();
+    </script>
+</body>
+</html></pre>
+        </body>
+    </html>
